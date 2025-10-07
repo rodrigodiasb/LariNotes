@@ -39,8 +39,10 @@
       margin-bottom: 1rem;
       background: #fff;
       transition: all 0.3s ease;
+      position: relative;
       cursor: pointer;
       animation: fadeIn 0.4s ease;
+      overflow: hidden;
     }
 
     .card:hover {
@@ -58,6 +60,39 @@
 
     .status-concluido {
       background: linear-gradient(145deg, #d6f5ea, #b5ead7);
+    }
+
+    .check-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 2px solid #a63a82;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #a63a82;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .check-btn:hover {
+      background: #a63a82;
+      color: #fff;
+    }
+
+    .check-anim {
+      animation: pop 0.3s ease;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.5); opacity: 0; }
+      80% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); }
     }
 
     .btn-add {
@@ -122,38 +157,7 @@
   </header>
 
   <main class="container">
-    <div id="cardsContainer" class="row">
-      <!-- Exemplo de cards -->
-      <div class="col-12 col-md-6 col-lg-4">
-        <div class="card status-pendente">
-          <div class="card-body">
-            <h5 class="card-title">Comprar flores 🌸</h5>
-            <p class="card-text">Lembrar de comprar flores pra mesa da sala.</p>
-            <small class="text-muted">Status: Pendente</small>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 col-md-6 col-lg-4">
-        <div class="card status-andamento">
-          <div class="card-body">
-            <h5 class="card-title">Preparar marmita 🍱</h5>
-            <p class="card-text">Cortar legumes e guardar para a semana.</p>
-            <small class="text-muted">Status: Em andamento</small>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 col-md-6 col-lg-4">
-        <div class="card status-concluido">
-          <div class="card-body">
-            <h5 class="card-title">Lavar o carro 🚗</h5>
-            <p class="card-text">Já está limpinho!</p>
-            <small class="text-muted">Status: Concluído</small>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div id="cardsContainer" class="row"></div>
   </main>
 
   <button class="btn-add" data-bs-toggle="modal" data-bs-target="#modalTarefa">+</button>
@@ -215,6 +219,7 @@
       card.className = 'col-12 col-md-6 col-lg-4';
       card.innerHTML = `
         <div class="card status-${status}">
+          <div class="check-btn" title="Concluir tarefa">○</div>
           <div class="card-body">
             <h5 class="card-title">${titulo}</h5>
             <p class="card-text">${descricao || ''}</p>
@@ -222,6 +227,20 @@
           </div>
         </div>
       `;
+
+      const cardElement = card.querySelector('.card');
+      const checkBtn = card.querySelector('.check-btn');
+
+      checkBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (cardElement.classList.contains('status-concluido')) return;
+
+        cardElement.classList.remove('status-pendente', 'status-andamento');
+        cardElement.classList.add('status-concluido');
+        checkBtn.innerHTML = '✔️';
+        checkBtn.classList.add('check-anim');
+        cardElement.querySelector('small').innerText = 'Status: Concluído';
+      });
 
       cardsContainer.prepend(card);
       document.getElementById('formTarefa').reset();
